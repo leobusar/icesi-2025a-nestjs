@@ -3,9 +3,13 @@
 /node_modules
 /build
 
+/postgres-data
+/pgadmin-data
+
 # Logs
 logs
 *.log
+
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*

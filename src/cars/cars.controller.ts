@@ -4,6 +4,7 @@ import { Body,
      Get, 
      Param, 
      ParseIntPipe, 
+     ParseUUIDPipe, 
      Patch, 
      Post, 
      Put, 
@@ -23,30 +24,29 @@ export class CarsController {
     getAll(
          @Query() params: SearchCarDto
     ){
-        return `Return ${params.limit} cars after ${params.offset}`;
+        return this.carService.getAll();
     }
 
     @Get(':id')
-    getById(@Param('id', ParseIntPipe) id: number){
+    getById(@Param('id', ParseUUIDPipe) id: string){
 
-        return 'return a car with id '+ (id+1);
+        return this.carService.findById(id);
     }
 
     @Patch(':id')
-    update(@Param('id', ParseIntPipe) id: string,
-           @Body() body:UpdateCarDto){
-        return {car: body, mess: `update car with id ${id}` };
+    update(@Param('id', ParseUUIDPipe) id: string,
+           @Body() car:UpdateCarDto){
+        return this.carService.update(id, car);
     }
     
     @Delete(':id')
-    delete(@Param('id', ParseIntPipe) id: string){
-        return 'delete a car with id '+id;
+    delete(@Param('id', ParseUUIDPipe) id: string){
+        return this.carService.delete(id);
     }
 
     @Post('')
     //@UsePipes(ValidationPipe)
     create(@Body() car:CreateCarDto){
-
         return this.carService.create(car);
     }
 }

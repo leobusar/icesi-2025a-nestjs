@@ -1,5 +1,5 @@
 class Car {
-    id: number;
+    id: string;
     brand: string;
     model: string; 
     year: number;
