@@ -1,54 +1,45 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {v4 as uuid} from "uuid";
+//import {v4 as uuid} from "uuid";
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
+import { Car } from './entities/car.entity';
+
 
 @Injectable()
 export class CarsService {
-    public cars: Car[] =  [
-        {
-            "brand": "Chevrolet",
-            "model": "Captiva", 
-            "year": 2021,
-            "id": uuid()
-        },
-        {
-            "brand": "Chevrolet",
-            "model": "Sprint", 
-            "year": 2000,
-            "id": uuid()        
-        }
-    ]
-    create(car: CreateCarDto): Car{
-        let carNew: Car =  {...car, id: uuid()}; 
-        this.cars.push(carNew);
-
-        return carNew;
+    constructor(
+        @InjectRepository(Car) private readonly carRepository: Repository<Car>,
+    ) {
     }
 
-    getAll(): Car[] {
-        return this.cars;
+    async create(car: CreateCarDto): Promise<Car> {
+            let carNew = await this.carRepository.save(car);
+            return carNew;
     }
 
-    findById(id: string): Car {
-        const car = this.cars.find(car => id == car.id); 
-        if (car === undefined) throw new NotFoundException();
+    getAll(): Promise<Car[]> {
+        return this.carRepository.find();
+    }
 
+    async findById(id: string): Promise<Car> {
+        const car = await this.carRepository.findOneBy({ id }); 
+        if (car == null ) throw new NotFoundException();
         return car;
     }
 
-    update(id: string, car: UpdateCarDto): Car {
-        const carUpdate = this.findById(id);
-        Object.assign(carUpdate,car); 
-
-        return carUpdate;
+    async update(id: string, car: UpdateCarDto): Promise<Car> {
+        const result = await this.carRepository.update(id, car);
+        if (result.affected &&  result.affected < 1 ) throw new NotFoundException();
+        return this.findById(id);
     }
 
-    delete(id: string): Car {
+    delete(id: string): Promise<Car> {
         const carDelete = this.findById(id);
-        this.cars = this.cars.filter(car => id!==car.id)
-
-        return carDelete; 
+        this.carRepository.delete(id);
+        if (carDelete == null ) throw new NotFoundException();
+        return carDelete;
     }
 }
