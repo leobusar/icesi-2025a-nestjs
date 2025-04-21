@@ -6,18 +6,24 @@ import { Repository } from 'typeorm';
 import { CreateCarDto } from './dto/create-car.dto';
 import { UpdateCarDto } from './dto/update-car.dto';
 import { Car } from './entities/car.entity';
+import { BrandsService } from 'src/brands/brands.service';
 
 
 @Injectable()
 export class CarsService {
     constructor(
         @InjectRepository(Car) private readonly carRepository: Repository<Car>,
+        private readonly brandsService: BrandsService,
     ) {
     }
 
     async create(car: CreateCarDto): Promise<Car> {
-            let carNew = await this.carRepository.save(car);
-            return carNew;
+        const brand = await this.brandsService.findOne(car.brand);
+        if (brand == null) throw new NotFoundException(`Brand with id ${car.brand} not found`);
+        const CarObj = Object.assign(car, { brand });
+        
+        let carNew = await this.carRepository.save(CarObj);
+        return carNew;
     }
 
     getAll(): Promise<Car[]> {

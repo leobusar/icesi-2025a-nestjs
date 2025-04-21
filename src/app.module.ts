@@ -5,6 +5,7 @@ import { CarsModule } from './cars/cars.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BrandsModule } from './brands/brands.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,8 +21,9 @@ import { BrandsModule } from './brands/brands.module';
       autoLoadEntities: true
     }),
     CarsModule,
-    BrandsModule
-  ],
+    BrandsModule,
+    AuthModule
+    ],
   controllers: [AppController],
   providers: [AppService],
 })
